@@ -1,5 +1,5 @@
 {
-    "name": "amidesfahani/filament-tinyeditor",
+    "name": "visualbuilder/filament-tinyeditor",
     "description": "Filament TinyMce Editor v6",
     "license": "MIT",
     "keywords": ["laravel", "filament", "tinyeditor", "tinymce"],
@@ -16,13 +16,13 @@
     },
     "autoload": {
         "psr-4": {
-            "AmidEsfahani\\FilamentTinyEditor\\": "src/"
+            "Visualbuilder\\FilamentTinyEditor\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "AmidEsfahani\\FilamentTinyEditor\\TinyeditorServiceProvider"
+                "Visualbuilder\\FilamentTinyEditor\\TinyeditorServiceProvider"
             ]
         }
     },

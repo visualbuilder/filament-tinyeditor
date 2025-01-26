@@ -8,7 +8,7 @@
 		"build": "npm-run-all build:*",
 		"prettier": "npx prettier --write ."
 	},
-	"author": "Amid Esfahani <amid.esfahani@gmail.com> (https://github.com/amidesfahani)",
+	"author": "Amid Esfahani <amid.esfahani@gmail.com>",
 	"license": "MIT",
 	"devDependencies": {
 		"alpinejs": "^3.10.5",

@@ -1,6 +1,6 @@
 <?php
 
-namespace AmidEsfahani\FilamentTinyEditor;
+namespace Visualbuilder\FilamentTinyEditor;
 
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;

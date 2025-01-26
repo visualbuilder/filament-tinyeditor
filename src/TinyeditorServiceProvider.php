@@ -1,6 +1,6 @@
 <?php
 
-namespace AmidEsfahani\FilamentTinyEditor;
+namespace Visualbuilder\FilamentTinyEditor;
 
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Css;
@@ -73,6 +73,6 @@ class TinyeditorServiceProvider extends PackageServiceProvider
 
     protected function getAssetPackageName(): ?string
     {
-        return 'amidesfahani/filament-tinyeditor';
+        return 'visualbuilder/filament-tinyeditor';
     }
 }

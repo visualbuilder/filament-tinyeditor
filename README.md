@@ -9,16 +9,16 @@ A [TineMce](https://www.tiny.cloud/) integration for [Filament](https://filament
 Install the package via composer
 
 ```bash
-composer require amidesfahani/filament-tinyeditor
+composer require visualbuilder/filament-tinyeditor
 ```
 
 Publish assets
 
 ```bash
-php artisan vendor:publish --provider="AmidEsfahani\FilamentTinyEditor\TinyeditorServiceProvider"
-php artisan vendor:publish --provider="AmidEsfahani\FilamentTinyEditor\TinyeditorServiceProvider" --tag="config"
-php artisan vendor:publish --provider="AmidEsfahani\FilamentTinyEditor\TinyeditorServiceProvider" --tag="views"
-php artisan vendor:publish --provider="AmidEsfahani\FilamentTinyEditor\TinyeditorServiceProvider" --tag="public"
+php artisan vendor:publish --provider="Visualbuilder\FilamentTinyEditor\TinyeditorServiceProvider"
+php artisan vendor:publish --provider="Visualbuilder\FilamentTinyEditor\TinyeditorServiceProvider" --tag="config"
+php artisan vendor:publish --provider="Visualbuilder\FilamentTinyEditor\TinyeditorServiceProvider" --tag="views"
+php artisan vendor:publish --provider="Visualbuilder\FilamentTinyEditor\TinyeditorServiceProvider" --tag="public"
 ```
 
 ## Usage
@@ -26,7 +26,7 @@ php artisan vendor:publish --provider="AmidEsfahani\FilamentTinyEditor\Tinyedito
 The editor extends the default Field class so most other methods available on that class can be used when adding it to a form.
 
 ```php
-use AmidEsfahani\FilamentTinyEditor\TinyEditor;
+use Visualbuilder\FilamentTinyEditor\TinyEditor;
 
 TinyEditor::make('content')
 	->fileAttachmentsDisk('public')

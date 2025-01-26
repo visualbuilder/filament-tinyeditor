@@ -1,6 +1,6 @@
 <?php
 
-namespace AmidEsfahani\FilamentTinyEditor;
+namespace Visualbuilder\FilamentTinyEditor;
 
 class Tiny
 {
