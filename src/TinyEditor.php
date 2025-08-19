@@ -8,7 +8,7 @@ use Filament\Forms\Components\Contracts;
 use Filament\Forms\Components\Field;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 
-class TinyEditor extends Field implements Contracts\CanBeLengthConstrained, Contracts\HasFileAttachments
+class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
 {
     use Concerns\CanBeLengthConstrained;
     use Concerns\HasFileAttachments;
