@@ -6,12 +6,11 @@
     @php
         $textareaID = 'tiny-editor-' . str_replace(['.', '#', '$'], '-', $getId()) . '-' . rand();
     @endphp
-
     <div wire:ignore x-load
-        x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('tinyeditor', 'visualbuilder/filament-tinyeditor') }}"
-        x-load-css="[@js(\Filament\Support\Facades\FilamentAsset::getStyleHref('tiny-css', package: 'visualbuilder/filament-tinyeditor'))]"
-        x-load-js="[@js(\Filament\Support\Facades\FilamentAsset::getScriptSrc($getLanguageId(), package: 'visualbuilder/filament-tinyeditor'))]"
-        x-data="tinyeditor({
+         x-load-src="{{ \Filament\Support\Facades\FilamentAsset::getAlpineComponentSrc('tinyeditor', 'visualbuilder/filament-tinyeditor') }}"
+         x-load-css="[@js(\Filament\Support\Facades\FilamentAsset::getStyleHref('tiny-css', package: 'visualbuilder/filament-tinyeditor'))]"
+         x-load-js="[@js(\Filament\Support\Facades\FilamentAsset::getScriptSrc($getLanguageId(), package: 'visualbuilder/filament-tinyeditor'))]"
+         x-data="tinyeditor({
             state: $wire.{{ $applyStateBindingModifiers("entangle('{$statePath}')", isOptimisticallyLive: false) }},
             statePath: '{{ $statePath }}',
             selector: '#{{ $textareaID }}',
@@ -82,16 +81,11 @@
             image_description: @js($getImageDescription()),
             image_class_list: @js($getImageClassList()),
             license_key: '{{ $getLicenseKey() }}',
-            custom_configs: {{ $getCustomConfigs() }},
-            {{-- removeImagesEventCallback: (img) => {
-                if (confirm('{{ __('Are you sure you want to remove this image?') }}')) {
-                    console.log(img)
-                }
-            }, --}}
+            custom_configs: {{ $getCustomConfigs() }}
         })">
         @if ($isDisabled())
             <div x-html="state" @style(['max-height: ' . $getPreviewMaxHeight() . 'px' => $getPreviewMaxHeight() > 0, 'min-height: ' . $getPreviewMinHeight() . 'px' => $getPreviewMinHeight() > 0])
-                class="block w-full p-3 overflow-y-auto prose transition duration-75 bg-white border border-gray-300 rounded-lg shadow-sm max-w-none opacity-70 dark:prose-invert dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+            class="block w-full p-3 overflow-y-auto prose transition duration-75 bg-white border border-gray-300 rounded-lg shadow-sm max-w-none opacity-70 dark:prose-invert dark:border-gray-600 dark:bg-gray-700 dark:text-white">
             </div>
         @else
             <input id="{{ $textareaID }}" type="hidden" x-ref="tinymce" placeholder="{{ $getPlaceholder() }}">
