@@ -71,11 +71,15 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
         $this->darkMode = config('filament-tinyeditor.darkMode', 'auto');
         $this->skinsUI = config('filament-tinyeditor.skins.ui', 'oxide');
         $this->skinsContent = config('filament-tinyeditor.skins.content', 'default');
-        
-        // Auto-generate unique ID if not set
-        if (!$this->getId()) {
-            $this->id('tiny_editor_' . str_replace('.', '_', uniqid('', true)));
+
+    }
+
+    public function getId(): ?string
+    {
+        if (!isset($this->id)) {
+            $this->id = 'tiny_editor_' . str_replace('.', '_', uniqid('', true));
         }
+        return parent::getId();
     }
 
     public function getToolbar(): string
