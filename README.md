@@ -1,15 +1,29 @@
-# Filament TineMce Editor
+# Filament TinyMCE Editor
 
-A [TineMce](https://www.tiny.cloud/) integration for [Filament](https://filamentphp.com/) Admin/Forms.
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/visualbuilder/filament-tinyeditor.svg?style=flat-square)](https://packagist.org/packages/visualbuilder/filament-tinyeditor)
+[![Total Downloads](https://img.shields.io/packagist/dt/visualbuilder/filament-tinyeditor.svg?style=flat-square)](https://packagist.org/packages/visualbuilder/filament-tinyeditor)
+
+A [TinyMCE](https://www.tiny.cloud/) integration for [Filament](https://filamentphp.com/) Admin/Forms.
 
 ![tiny-editor](images/filament-tinyeditor.jpg?raw=true)
+
+## Version Compatibility
+
+| Package Version | Filament | Laravel | PHP |
+|-----------------|----------|---------|-----|
+| 5.x | 5.x | 11.x, 12.x | 8.2+ |
+| 4.x | 4.x | 11.x | 8.2+ |
 
 ## Installation
 
 Install the package via composer
 
 ```bash
-composer require visualbuilder/filament-tinyeditor
+# For Filament 5.x
+composer require visualbuilder/filament-tinyeditor:^5.0
+
+# For Filament 4.x
+composer require visualbuilder/filament-tinyeditor:^4.0
 ```
 
 Publish assets
@@ -97,10 +111,29 @@ can switch the `direction` key in the config to 'rtl'.
 'direction' => 'rtl'
 ```
 
-## Versioning
+## Testing
 
-This project follow the [Semantic Versioning](https://semver.org/) guidelines.
+```bash
+composer test
+```
+
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
+## Contributing
+
+Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+
+## Security Vulnerabilities
+
+Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+
+## Credits
+
+- [Visual Builder](https://github.com/visualbuilder)
+- [All Contributors](../../contributors)
 
 ## License
 
-Licensed under the MIT license, see [LICENSE.md](LICENSE.md) for details.
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
