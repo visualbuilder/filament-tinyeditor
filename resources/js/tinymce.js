@@ -145,6 +145,11 @@ export default function tinyeditor({
 				inline: inline,
 				toolbar_persist: toolbar_persist,
 				menubar: menubar,
+				browser_spellcheck: true,
+				content_langs: [
+					{ title: 'British English', code: 'en-GB' },
+					{ title: 'American English', code: 'en-US' }
+				],
 				menu: {
 					file: {
 						title: "File",
@@ -227,6 +232,13 @@ export default function tinyeditor({
 						editors[_this.statePath] = editor.id;
 						if (content != null) {
 							editor.setContent(content);
+						}
+
+						// Set lang attribute on editor body for browser spell check
+						const editorBody = editor.getBody();
+						if (editorBody) {
+							editorBody.setAttribute('lang', 'en-GB');
+							editorBody.setAttribute('spellcheck', 'true');
 						}
 					});
 
