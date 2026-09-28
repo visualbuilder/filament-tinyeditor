@@ -2,6 +2,11 @@
 
 All notable changes to `filament-tinyeditor` will be documented in this file.
 
+## [6.0.1] - 2026-09-28
+
+### Added
+- The editor follows Filament's light/dark switch without a reload: pass `skin_dark`, `content_css_dark`, `skin_light` and `content_css_light` to the Alpine component and it re-initialises on the `theme-changed` window event, keeping its content. `initEditor` now reads the skin from component state. The listener is removed in Alpine's `destroy()`.
+
 ## [5.0.0] - 2026-03-31
 
 ### Added

@@ -17,6 +17,10 @@ export default function tinyeditor({
 	resize = false,
 	skin = "oxide",
 	content_css = "default",
+	skin_dark = null,
+	content_css_dark = null,
+	skin_light = null,
+	content_css_light = null,
 	toolbar_sticky = true,
 	toolbar_sticky_offset = 64,
 	toolbar_mode = 'sliding',
@@ -61,6 +65,11 @@ export default function tinyeditor({
 		resize: resize,
 		skin: skin,
 		content_css: content_css,
+		skin_dark: skin_dark,
+		content_css_dark: content_css_dark,
+		skin_light: skin_light,
+		content_css_light: content_css_light,
+		themeHandler: null,
 		plugins: plugins,
 		external_plugins: external_plugins,
 		toolbar: toolbar,
@@ -91,6 +100,25 @@ export default function tinyeditor({
 			this.initEditor(state.initialValue);
 
 			window.filamentTinyEditors = editors;
+
+			// Follow the panel's light/dark switch without a reload: the skin
+			// is baked into the TinyMCE config, so re-init with the other pair.
+			// Only when the caller supplies both skins.
+			if (skin_dark && skin_light) {
+				this.themeHandler = (event) => {
+					const theme = event.detail;
+					const dark = theme === "dark"
+						|| (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+					const nextSkin = dark ? skin_dark : skin_light;
+					if (nextSkin === this.skin) return;
+					this.skin = nextSkin;
+					this.content_css = dark ? (content_css_dark ?? content_css) : (content_css_light ?? content_css);
+					const current = this.editor()?.getContent() ?? this.state;
+					this.delete();
+					this.initEditor(current);
+				};
+				window.addEventListener("theme-changed", this.themeHandler);
+			}
 
 			this.$watch("state", (newState, oldState) => {
 				if (newState === "<p></p>" && newState !== this.editor()?.getContent()) {
@@ -133,8 +161,8 @@ export default function tinyeditor({
 				max_width: max_width,
 				min_width: min_width,
 				resize: resize,
-				skin: skin,
-				content_css: content_css,
+				skin: this.skin,
+				content_css: this.content_css,
 				plugins: plugins,
 				external_plugins: external_plugins,
 				toolbar: toolbar,
@@ -365,6 +393,13 @@ export default function tinyeditor({
 			if (editors[this.statePath]) {
 				this.editor().destroy();
 				delete	editors[this.statePath];
+			}
+		},
+		// Alpine calls this when the element leaves the DOM.
+		destroy() {
+			if (this.themeHandler) {
+				window.removeEventListener("theme-changed", this.themeHandler);
+				this.themeHandler = null;
 			}
 		}
 	};

@@ -110,6 +110,17 @@ can switch the `direction` key in the config to 'rtl'.
 'direction' => 'rtl'
 ```
 
+### Following the panel's light/dark switch
+
+TinyMCE bakes its skin into the editor config, so a panel theme change used to need a page reload. Pass both skin pairs to the Alpine component (the published `tiny-editor.blade.php` view does this) and the editor re-initialises itself on Filament's `theme-changed` window event, keeping its content:
+
+```js
+skin_dark: 'oxide-dark', content_css_dark: 'dark',
+skin_light: 'oxide',     content_css_light: 'default',
+```
+
+Omit them and the editor keeps the skin it was initialised with.
+
 ## Versioning
 
 This project follow the [Semantic Versioning](https://semver.org/) guidelines.
