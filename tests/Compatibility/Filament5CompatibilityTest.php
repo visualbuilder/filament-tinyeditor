@@ -14,6 +14,9 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Foundation\Application;
 use Visualbuilder\FilamentTinyEditor\TinyEditor;
 
 /**
@@ -25,6 +28,17 @@ use Visualbuilder\FilamentTinyEditor\TinyEditor;
  *
  * @see FILAMENT5_COMPATIBILITY_REPORT.md for detailed analysis
  */
+
+/*
+ * TinyEditor::make() reads config() and app()->getLocale(), so a test that builds the field needs an application container.
+ * The package has no Testbench; this boots the smallest container that satisfies both.
+ */
+beforeEach(function () {
+    $app = new Application(dirname(__DIR__, 2));
+    $app->instance('config', new Repository(['app' => ['locale' => 'en']]));
+
+    Container::setInstance($app);
+});
 
 it('is now running on Filament 5.x', function () {
     // Verify we successfully upgraded to Filament 5
@@ -240,6 +254,43 @@ it('has valid Blade view file', function () {
 
     // Check that view does NOT use Schemas namespace
     expect($viewContent)->not->toContain('Filament\Schemas');
+})->group('compatibility', 'filament5');
+
+it('refuses file attachments unless the caller enables them', function () {
+    expect(TinyEditor::make('x')->hasFileAttachments())->toBeFalse();
+    expect(TinyEditor::make('x')->fileAttachments(true)->hasFileAttachments())->toBeTrue();
+})->group('compatibility', 'filament5');
+
+it('allows a dropped file by default and refuses it after allowFileDrop(false)', function () {
+    expect(TinyEditor::make('x')->canDropFiles())->toBeTrue();
+    expect(TinyEditor::make('x')->allowFileDrop(false)->canDropFiles())->toBeFalse();
+})->group('compatibility', 'filament5');
+
+it('prefers pasted image files only after preferPastedImageFiles()', function () {
+    expect(TinyEditor::make('x')->shouldPreferPastedImageFiles())->toBeFalse();
+    expect(TinyEditor::make('x')->preferPastedImageFiles()->shouldPreferPastedImageFiles())->toBeTrue();
+})->group('compatibility', 'filament5');
+
+it('saves a pasted image through the Filament 5 schema component call', function () {
+    $viewContent = file_get_contents(__DIR__ . '/../../resources/views/tiny-editor.blade.php');
+
+    expect($viewContent)->toContain('component_key:');
+    expect($viewContent)->toContain('file_attachments:');
+
+    $script = file_get_contents(__DIR__ . '/../../resources/js/tinymce.js');
+
+    expect($script)->toContain('saveUploadedFileAttachmentAndGetUrl');
+    // The Filament 3 method no longer exists; calling it makes Livewire answer 419.
+    expect($script)->not->toContain('getFormComponentFileAttachmentUrl');
+})->group('compatibility', 'filament5');
+
+it('tells the user when a pasted image file cannot be read', function () {
+    foreach (['resources/js/tinymce.js', 'resources/dist/filament-tinymce-editor.js'] as $path) {
+        $script = file_get_contents(__DIR__ . '/../../' . $path);
+
+        // The default paste is cancelled before the file is read, so a read failure needs its own message.
+        expect($script)->toContain('The image could not be read. Copy it again and paste.');
+    }
 })->group('compatibility', 'filament5');
 
 it('documents no breaking changes expected for Filament 5', function () {

@@ -81,6 +81,12 @@
             image_description: @js($getImageDescription()),
             image_class_list: @js($getImageClassList()),
             license_key: '{{ $getLicenseKey() }}',
+            component_key: @js($getKey()),
+            file_attachments: @js($hasFileAttachments()),
+            file_attachments_accepted_types: @js($getFileAttachmentsAcceptedFileTypes() ?? []),
+            file_attachments_max_size: @js($getFileAttachmentsMaxSize()),
+            allow_file_drop: @js($canDropFiles()),
+            prefer_pasted_image_files: @js($shouldPreferPastedImageFiles()),
             custom_configs: {{ $getCustomConfigs() }}
         })">
         @if ($isDisabled())

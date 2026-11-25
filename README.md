@@ -42,6 +42,7 @@ The editor extends the default Field class so most other methods available on th
 use Visualbuilder\FilamentTinyEditor\TinyEditor;
 
 TinyEditor::make('content')
+	->fileAttachments(true) // image paste and uploads are off without this
 	->fileAttachmentsDisk('public')
 	->fileAttachmentsVisibility('public')
 	->fileAttachmentsDirectory('uploads')
@@ -121,6 +122,35 @@ skin_light: 'oxide',     content_css_light: 'default',
 
 Omit them and the editor keeps the skin it was initialised with.
 
+### Pasted images
+
+Image paste and file uploads are off by default. Pasted `data:` images and dropped image files are then discarded. A remote `<img>` inside pasted HTML is still inserted. Call `->fileAttachments(true)` on the field to accept them:
+
+```php
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Visualbuilder\FilamentTinyEditor\TinyEditor;
+
+TinyEditor::make('content')
+    ->fileAttachments(true)
+    ->fileAttachmentsDisk('s3')
+    ->fileAttachmentsDirectory('editor-images')
+    ->fileAttachmentsAcceptedFileTypes(['image/png', 'image/jpeg'])
+    ->fileAttachmentsMaxSize(2048) // KB
+    // Optional: store the file yourself and return what getFileAttachmentUrlUsing() receives.
+    ->saveUploadedFileAttachmentUsing(fn (TemporaryUploadedFile $file): string => $file->store('editor-images', 's3'))
+    // Optional: the URL the editor puts in the <img src>.
+    ->getFileAttachmentUrlUsing(fn (string $file): string => route('editor.image', ['path' => $file]))
+    // Optional: a file dropped on the body is not inserted. Text and links still drop.
+    ->allowFileDrop(false)
+    // Optional: when the clipboard holds an image file and an <img> to a remote URL, upload the file.
+    ->preferPastedImageFiles();
+```
+
+The editor uploads the file with Livewire, then calls Filament's `saveUploadedFileAttachmentAndGetUrl()` on the field. Filament validates the accepted types and the maximum size on the server. A failed upload shows a message in the editor and removes the image.
+
+If your app publishes `tiny-editor.blade.php`, copy the `component_key`, `file_attachments`, `file_attachments_accepted_types`, `file_attachments_max_size`, `allow_file_drop` and `prefer_pasted_image_files` arguments from the package view into it.
+
+## Versioning
 ## Versioning
 
 This project follow the [Semantic Versioning](https://semver.org/) guidelines.

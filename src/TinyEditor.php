@@ -2,6 +2,7 @@
 
 namespace Visualbuilder\FilamentTinyEditor;
 
+use Closure;
 use Filament\Forms\Components\Concerns;
 use Filament\Forms\Components\Concerns\HasExtraInputAttributes;
 use Filament\Forms\Components\Contracts;
@@ -53,6 +54,8 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
     protected bool $imageAdvtab = false;
     protected bool $imageDescription = true;
     protected bool|string $resize = false;
+    protected bool | Closure $allowFileDrop = true;
+    protected bool | Closure $preferPastedImageFiles = false;
 
     protected string $tiny;
     protected string $languageVersion;
@@ -470,6 +473,52 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
         $this->resize = $resize;
 
         return $this;
+    }
+
+    /**
+     * Pasted image files are refused unless the caller calls fileAttachments(true).
+     *
+     * @return bool
+     */
+    public function hasFileAttachmentsByDefault(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Whether a file dropped on the editor body may be inserted. Text and links always drop normally.
+     *
+     * @param  bool|Closure  $condition
+     * @return static
+     */
+    public function allowFileDrop(bool | Closure $condition = true): static
+    {
+        $this->allowFileDrop = $condition;
+
+        return $this;
+    }
+
+    public function canDropFiles(): bool
+    {
+        return (bool) $this->evaluate($this->allowFileDrop);
+    }
+
+    /**
+     * When the clipboard holds an image file next to HTML that is only an <img>, upload the file instead of inserting the HTML.
+     *
+     * @param  bool|Closure  $condition
+     * @return static
+     */
+    public function preferPastedImageFiles(bool | Closure $condition = true): static
+    {
+        $this->preferPastedImageFiles = $condition;
+
+        return $this;
+    }
+
+    public function shouldPreferPastedImageFiles(): bool
+    {
+        return (bool) $this->evaluate($this->preferPastedImageFiles);
     }
 
     public function getToolbarSticky(): bool

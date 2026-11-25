@@ -2,6 +2,22 @@
 
 All notable changes to `filament-tinyeditor` will be documented in this file.
 
+## [6.1.0] - 2026-11-25
+
+### Fixed
+- A pasted image uploads on Filament 5. The upload handler called `getFormComponentFileAttachmentUrl()`, a Filament 3 Livewire method that no longer exists, so Livewire answered 419 ("page expired"). It now calls `callSchemaComponentMethod(key, 'saveUploadedFileAttachmentAndGetUrl')`.
+- A failed upload shows a message in the editor and removes the image. The error callback was empty.
+- With `preferPastedImageFiles()` on, a clipboard image that cannot be read shows a message in the editor. The paste used to be lost with no image and no message.
+
+### Changed
+- Image paste and file uploads are off unless the field calls `->fileAttachments(true)` (`hasFileAttachmentsByDefault()` returns `false`). With them off, TinyMCE gets `paste_data_images: false` and `automatic_uploads: false`, and no upload handler. Uploads failed on every earlier 6.x release, so no working behaviour is lost.
+- The browser refuses an image whose type is not in `fileAttachmentsAcceptedFileTypes()` or that is larger than `fileAttachmentsMaxSize()` before it uploads. Filament still validates both on the server.
+
+### Added
+- `allowFileDrop(bool | Closure $condition = true)`: pass `false` and a file dropped on the body is not inserted. Text and links still drop normally.
+- `preferPastedImageFiles(bool | Closure $condition = true)`: when the clipboard holds an image file next to HTML that is only an `<img>` (Teams, browsers), the editor uploads the file instead of inserting the remote `<img>`.
+- The view passes `component_key`, `file_attachments`, `file_attachments_accepted_types`, `file_attachments_max_size`, `allow_file_drop` and `prefer_pasted_image_files` to the Alpine component. An app that publishes `tiny-editor.blade.php` must add them to its copy.
+
 ## [6.0.1] - 2026-09-28
 
 ### Added
