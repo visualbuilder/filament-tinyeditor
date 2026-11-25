@@ -477,6 +477,8 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
 
     /**
      * Pasted image files are refused unless the caller calls fileAttachments(true).
+     *
+     * @return bool
      */
     public function hasFileAttachmentsByDefault(): bool
     {
@@ -485,6 +487,9 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
 
     /**
      * Whether a file dropped on the editor body may be inserted. Text and links always drop normally.
+     *
+     * @param  bool|Closure  $condition
+     * @return static
      */
     public function allowFileDrop(bool | Closure $condition = true): static
     {
@@ -500,6 +505,9 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
 
     /**
      * When the clipboard holds an image file next to HTML that is only an <img>, upload the file instead of inserting the HTML.
+     *
+     * @param  bool|Closure  $condition
+     * @return static
      */
     public function preferPastedImageFiles(bool | Closure $condition = true): static
     {

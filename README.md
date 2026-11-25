@@ -124,7 +124,7 @@ Omit them and the editor keeps the skin it was initialised with.
 
 ### Pasted images
 
-Image paste and file uploads are off by default. A pasted or dropped image is then discarded. Call `->fileAttachments(true)` on the field to accept them:
+Image paste and file uploads are off by default. Pasted `data:` images and dropped image files are then discarded. A remote `<img>` inside pasted HTML is still inserted. Call `->fileAttachments(true)` on the field to accept them:
 
 ```php
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
