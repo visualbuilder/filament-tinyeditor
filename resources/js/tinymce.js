@@ -39,6 +39,12 @@ export default function tinyeditor({
 	images_upload_base_path = null,
 	remove_script_host = true,
 	convert_urls = true,
+	component_key = null,
+	file_attachments = false,
+	file_attachments_accepted_types = [],
+	file_attachments_max_size = null,
+	allow_file_drop = true,
+	prefer_pasted_image_files = false,
 	custom_configs = {},
 	setup = null,
 	disabled = false,
@@ -88,6 +94,12 @@ export default function tinyeditor({
 		images_upload_url: images_upload_url,
 		images_upload_base_path: images_upload_base_path,
 		license_key: license_key,
+		component_key: component_key,
+		file_attachments: file_attachments,
+		file_attachments_accepted_types: file_attachments_accepted_types,
+		file_attachments_max_size: file_attachments_max_size,
+		allow_file_drop: allow_file_drop,
+		prefer_pasted_image_files: prefer_pasted_image_files,
 		custom_configs: custom_configs,
 		updatedAt: Date.now(),
 		disabled,
@@ -227,6 +239,9 @@ export default function tinyeditor({
 
 				...custom_configs,
 
+				// Pasted data images are kept only when the field accepts file attachments.
+				paste_data_images: file_attachments,
+
 				setup: function (editor) {
 					if (!window.tinySettingsCopy) {
 						window.tinySettingsCopy = [];
@@ -272,47 +287,87 @@ export default function tinyeditor({
 						}
 					});
 
+					if (!allow_file_drop) {
+						// A dropped file never goes into the body; text and links still drop normally.
+						editor.on("drop", (e) => {
+							if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+								e.preventDefault();
+							}
+						});
+					}
+
+					if (prefer_pasted_image_files && file_attachments) {
+						// Teams and browsers put an <img> to a remote URL on the clipboard next to the image file; upload the file instead.
+						editor.on("paste", (e) => {
+							const data = e.clipboardData;
+							if (!data) {
+								return;
+							}
+							const html = data.getData("text/html");
+							const files = Array.from(data.items || [])
+								.filter((item) => item.kind === "file" && (file_attachments_accepted_types.length === 0 || file_attachments_accepted_types.includes(item.type)))
+								.map((item) => item.getAsFile())
+								.filter((file) => file !== null);
+							if (!html || files.length === 0) {
+								return;
+							}
+							const body = new DOMParser().parseFromString(html, "text/html").body;
+							if (body.querySelector("img") === null || body.textContent.trim() !== "") {
+								return;
+							}
+							e.preventDefault();
+							Promise.all(files.map((file) => new Promise((resolve, reject) => {
+								const reader = new FileReader();
+								reader.onload = () => resolve(reader.result);
+								reader.onerror = () => reject(reader.error);
+								reader.readAsDataURL(file);
+							}))).then((urls) => {
+								urls.forEach((url) => editor.insertContent('<img src="' + url + '">'));
+								editor.uploadImages();
+							});
+						});
+					}
+
 					if (typeof setup === "function") {
 						setup(editor);
 					}
 				},
 
-				images_upload_handler: (blobInfo, progress) =>
-					new Promise((success, failure) => {
-						if (!blobInfo.blob()) return;
-
-						const pathJoin = (path1, path2) => {
-							if (path1) {
-							  return path1.replace(/\/$/, '') + '/' + path2.replace(/^\//, '');
+				...(file_attachments ? {
+					images_upload_handler: (blobInfo, progress) =>
+						new Promise((success, failure) => {
+							const blob = blobInfo.blob();
+							if (!blob) {
+								failure({ message: "Image upload failed.", remove: true });
+								return;
 							}
-							return path2;
-						};
+							if (file_attachments_accepted_types.length > 0 && !file_attachments_accepted_types.includes(blob.type)) {
+								failure({ message: "This image type cannot be pasted.", remove: true });
+								return;
+							}
+							if (file_attachments_max_size !== null && blob.size > file_attachments_max_size * 1024) {
+								failure({ message: "This image is too large to paste.", remove: true });
+								return;
+							}
 
-						const finishCallback = () => {
-							$wire.getFormComponentFileAttachmentUrl(statePath).then((url) => {
-								if (!url) {
-									failure("Image upload failed");
-									return;
-								}
-								success(pathJoin(images_upload_base_path, url));
-							});
-						};
+							const pathJoin = (path1, path2) => path1 ? path1.replace(/\/$/, "") + "/" + path2.replace(/^\//, "") : path2;
+							const fail = () => failure({ message: "Image upload failed.", remove: true });
 
-						const errorCallback = () => {};
+							// Filament 5: upload into componentFileAttachments, then ask the schema component to save the file and return its URL.
+							$wire.upload(
+								`componentFileAttachments.${statePath}`,
+								blob,
+								() => {
+									$wire.callSchemaComponentMethod(component_key, "saveUploadedFileAttachmentAndGetUrl", {})
+										.then((url) => (url ? success(pathJoin(images_upload_base_path, url)) : fail()))
+										.catch(fail);
+								},
+								fail,
+								(e) => progress(e.detail.progress),
+							);
+						}),
+				} : {}),
 
-						const progressCallback = (e) => {
-							progress(e.detail.progress);
-						};
-
-						$wire.upload(
-							`componentFileAttachments.${statePath}`,
-							blobInfo.blob(),
-							finishCallback,
-							errorCallback,
-							progressCallback
-						);
-					}),
-				
 				init_instance_callback: function (editor) {
 					var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 
@@ -377,7 +432,7 @@ export default function tinyeditor({
 					});
 				},					
 
-				automatic_uploads: true,
+				automatic_uploads: file_attachments,
 			};
 
 			tinymce.init(tinyConfig);
