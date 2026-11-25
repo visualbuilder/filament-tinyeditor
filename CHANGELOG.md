@@ -7,6 +7,7 @@ All notable changes to `filament-tinyeditor` will be documented in this file.
 ### Fixed
 - A pasted image uploads on Filament 5. The upload handler called `getFormComponentFileAttachmentUrl()`, a Filament 3 Livewire method that no longer exists, so Livewire answered 419 ("page expired"). It now calls `callSchemaComponentMethod(key, 'saveUploadedFileAttachmentAndGetUrl')`.
 - A failed upload shows a message in the editor and removes the image. The error callback was empty.
+- With `preferPastedImageFiles()` on, a clipboard image that cannot be read shows a message in the editor. The paste used to be lost with no image and no message.
 
 ### Changed
 - Image paste and file uploads are off unless the field calls `->fileAttachments(true)` (`hasFileAttachmentsByDefault()` returns `false`). With them off, TinyMCE gets `paste_data_images: false` and `automatic_uploads: false`, and no upload handler. Uploads failed on every earlier 6.x release, so no working behaviour is lost.

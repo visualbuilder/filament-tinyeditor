@@ -284,6 +284,15 @@ it('saves a pasted image through the Filament 5 schema component call', function
     expect($script)->not->toContain('getFormComponentFileAttachmentUrl');
 })->group('compatibility', 'filament5');
 
+it('tells the user when a pasted image file cannot be read', function () {
+    foreach (['resources/js/tinymce.js', 'resources/dist/filament-tinymce-editor.js'] as $path) {
+        $script = file_get_contents(__DIR__ . '/../../' . $path);
+
+        // The default paste is cancelled before the file is read, so a read failure needs its own message.
+        expect($script)->toContain('The image could not be read. Copy it again and paste.');
+    }
+})->group('compatibility', 'filament5');
+
 it('documents no breaking changes expected for Filament 5', function () {
     // This test documents that we expect minimal breaking changes
     $expectedBreakingChanges = [

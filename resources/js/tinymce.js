@@ -324,6 +324,9 @@ export default function tinyeditor({
 							}))).then((urls) => {
 								urls.forEach((url) => editor.insertContent('<img src="' + url + '">'));
 								editor.uploadImages();
+							}).catch(() => {
+								// The default paste is already cancelled, so say why nothing arrived. The clipboard's remote <img> is not inserted: it is the broken preview this option exists to avoid.
+								editor.notificationManager.open({ text: "The image could not be read. Copy it again and paste.", type: "error", timeout: 6000 });
 							});
 						});
 					}
