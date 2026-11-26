@@ -142,13 +142,16 @@ TinyEditor::make('content')
     ->getFileAttachmentUrlUsing(fn (string $file): string => route('editor.image', ['path' => $file]))
     // Optional: a file dropped on the body is not inserted. Text and links still drop.
     ->allowFileDrop(false)
+    // Optional: announce files dragged over or dropped on the body as `tinyeditor-file-dragover`
+    // (detail: { statePath }) and `tinyeditor-files-dropped` (detail: { statePath, files: File[] }) window events.
+    ->dispatchDroppedFiles()
     // Optional: when the clipboard holds an image file and an <img> to a remote URL, upload the file.
     ->preferPastedImageFiles();
 ```
 
 The editor uploads the file with Livewire, then calls Filament's `saveUploadedFileAttachmentAndGetUrl()` on the field. Filament validates the accepted types and the maximum size on the server. A failed upload shows a message in the editor and removes the image.
 
-If your app publishes `tiny-editor.blade.php`, copy the `component_key`, `file_attachments`, `file_attachments_accepted_types`, `file_attachments_max_size`, `allow_file_drop` and `prefer_pasted_image_files` arguments from the package view into it.
+If your app publishes `tiny-editor.blade.php`, copy the `component_key`, `file_attachments`, `file_attachments_accepted_types`, `file_attachments_max_size`, `allow_file_drop`, `prefer_pasted_image_files` and `dispatch_dropped_files` arguments from the package view into it.
 
 ## Versioning
 ## Versioning

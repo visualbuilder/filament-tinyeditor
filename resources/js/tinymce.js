@@ -45,6 +45,7 @@ export default function tinyeditor({
 	file_attachments_max_size = null,
 	allow_file_drop = true,
 	prefer_pasted_image_files = false,
+	dispatch_dropped_files = false,
 	custom_configs = {},
 	setup = null,
 	disabled = false,
@@ -287,12 +288,49 @@ export default function tinyeditor({
 						}
 					});
 
+					// A drag that starts in the body (a moved image or selection) is the editor's own, even when the browser adds a File to it.
+					let dragStartedInBody = false;
+					editor.on("dragstart", () => {
+						dragStartedInBody = true;
+					});
+					editor.on("dragend", () => {
+						dragStartedInBody = false;
+					});
+					editor.on("drop", () => {
+						// The moved node can leave the document before dragend, so a drop also ends the drag, after the handlers below ran.
+						setTimeout(() => {
+							dragStartedInBody = false;
+						}, 0);
+					});
+
 					if (!allow_file_drop) {
-						// A dropped file never goes into the body; text and links still drop normally.
+						// A dropped file never goes into the body; text, links and content moved within the body still drop normally.
 						editor.on("drop", (e) => {
-							if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+							if (!dragStartedInBody && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
 								e.preventDefault();
 							}
+						});
+					}
+
+					if (dispatch_dropped_files) {
+						// Files dragged onto the body from outside are announced to the page, which decides where they go.
+						const carriesFiles = (e) => Array.from(e.dataTransfer?.types ?? []).includes("Files");
+
+						editor.on("dragover", (e) => {
+							if (dragStartedInBody || !carriesFiles(e)) {
+								return;
+							}
+							e.preventDefault();
+							window.dispatchEvent(new CustomEvent("tinyeditor-file-dragover", { detail: { statePath: _this.statePath } }));
+						});
+
+						editor.on("drop", (e) => {
+							const files = Array.from(e.dataTransfer?.files ?? []);
+							if (dragStartedInBody || files.length === 0) {
+								return;
+							}
+							e.preventDefault();
+							window.dispatchEvent(new CustomEvent("tinyeditor-files-dropped", { detail: { statePath: _this.statePath, files } }));
 						});
 					}
 
