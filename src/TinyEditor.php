@@ -56,6 +56,7 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
     protected bool|string $resize = false;
     protected bool | Closure $allowFileDrop = true;
     protected bool | Closure $preferPastedImageFiles = false;
+    protected bool | Closure $dispatchDroppedFiles = false;
 
     protected string $tiny;
     protected string $languageVersion;
@@ -519,6 +520,26 @@ class TinyEditor extends Field implements Contracts\CanBeLengthConstrained
     public function shouldPreferPastedImageFiles(): bool
     {
         return (bool) $this->evaluate($this->preferPastedImageFiles);
+    }
+
+    /**
+     * Announce files dragged over or dropped on the editor body as window events instead of inserting them.
+     * Text and links still drop normally. Events: `tinyeditor-file-dragover` (detail: { statePath })
+     * and `tinyeditor-files-dropped` (detail: { statePath, files: File[] }).
+     *
+     * @param bool|Closure $condition
+     * @return static
+     */
+    public function dispatchDroppedFiles(bool | Closure $condition = true): static
+    {
+        $this->dispatchDroppedFiles = $condition;
+
+        return $this;
+    }
+
+    public function shouldDispatchDroppedFiles(): bool
+    {
+        return (bool) $this->evaluate($this->dispatchDroppedFiles);
     }
 
     public function getToolbarSticky(): bool

@@ -2,6 +2,12 @@
 
 All notable changes to `filament-tinyeditor` will be documented in this file.
 
+## [6.2.0] - 2026-11-26
+
+### Added
+- `dispatchDroppedFiles(bool | Closure $condition = true)` announces files dragged over or dropped on the body as `tinyeditor-file-dragover` / `tinyeditor-files-dropped` window events instead of inserting them. Text and links still drop normally.
+- The view passes `dispatch_dropped_files` to the Alpine component. An app that publishes `tiny-editor.blade.php` must add it to its copy.
+
 ## [6.1.0] - 2026-11-25
 
 ### Fixed

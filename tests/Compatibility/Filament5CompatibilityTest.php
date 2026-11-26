@@ -271,6 +271,25 @@ it('prefers pasted image files only after preferPastedImageFiles()', function ()
     expect(TinyEditor::make('x')->preferPastedImageFiles()->shouldPreferPastedImageFiles())->toBeTrue();
 })->group('compatibility', 'filament5');
 
+it('announces dropped files only after dispatchDroppedFiles()', function () {
+    expect(TinyEditor::make('x')->shouldDispatchDroppedFiles())->toBeFalse();
+    expect(TinyEditor::make('x')->dispatchDroppedFiles()->shouldDispatchDroppedFiles())->toBeTrue();
+    expect(TinyEditor::make('x')->dispatchDroppedFiles(false)->shouldDispatchDroppedFiles())->toBeFalse();
+})->group('compatibility', 'filament5');
+
+it('passes dispatch_dropped_files to the script, which announces dropped files', function () {
+    $view = file_get_contents(__DIR__ . '/../../resources/views/tiny-editor.blade.php');
+
+    expect($view)->toContain('dispatch_dropped_files: @js($shouldDispatchDroppedFiles())');
+
+    foreach (['resources/js/tinymce.js', 'resources/dist/filament-tinymce-editor.js'] as $path) {
+        $script = file_get_contents(__DIR__ . '/../../' . $path);
+
+        expect($script)->toContain('tinyeditor-files-dropped');
+        expect($script)->toContain('tinyeditor-file-dragover');
+    }
+})->group('compatibility', 'filament5');
+
 it('saves a pasted image through the Filament 5 schema component call', function () {
     $viewContent = file_get_contents(__DIR__ . '/../../resources/views/tiny-editor.blade.php');
 

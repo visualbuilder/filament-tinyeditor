@@ -87,6 +87,7 @@
             file_attachments_max_size: @js($getFileAttachmentsMaxSize()),
             allow_file_drop: @js($canDropFiles()),
             prefer_pasted_image_files: @js($shouldPreferPastedImageFiles()),
+            dispatch_dropped_files: @js($shouldDispatchDroppedFiles()),
             custom_configs: {{ $getCustomConfigs() }}
         })">
         @if ($isDisabled())

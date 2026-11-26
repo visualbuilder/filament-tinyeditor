@@ -45,6 +45,7 @@ export default function tinyeditor({
 	file_attachments_max_size = null,
 	allow_file_drop = true,
 	prefer_pasted_image_files = false,
+	dispatch_dropped_files = false,
 	custom_configs = {},
 	setup = null,
 	disabled = false,
@@ -293,6 +294,28 @@ export default function tinyeditor({
 							if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
 								e.preventDefault();
 							}
+						});
+					}
+
+					if (dispatch_dropped_files) {
+						// Files dragged onto the body are announced to the page, which decides where they go.
+						const carriesFiles = (e) => Array.from(e.dataTransfer?.types ?? []).includes("Files");
+
+						editor.on("dragover", (e) => {
+							if (!carriesFiles(e)) {
+								return;
+							}
+							e.preventDefault();
+							window.dispatchEvent(new CustomEvent("tinyeditor-file-dragover", { detail: { statePath: _this.statePath } }));
+						});
+
+						editor.on("drop", (e) => {
+							const files = Array.from(e.dataTransfer?.files ?? []);
+							if (files.length === 0) {
+								return;
+							}
+							e.preventDefault();
+							window.dispatchEvent(new CustomEvent("tinyeditor-files-dropped", { detail: { statePath: _this.statePath, files } }));
 						});
 					}
 
