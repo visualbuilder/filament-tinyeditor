@@ -290,6 +290,17 @@ it('passes dispatch_dropped_files to the script, which announces dropped files',
     }
 })->group('compatibility', 'filament5');
 
+it('leaves a drag that starts in the body to the editor', function () {
+    $script = file_get_contents(__DIR__ . '/../../resources/js/tinymce.js');
+
+    expect($script)->toContain('editor.on("dragstart"')
+        ->and($script)->toContain('if (!dragStartedInBody && e.dataTransfer')
+        ->and($script)->toContain('if (dragStartedInBody || !carriesFiles(e))')
+        ->and($script)->toContain('if (dragStartedInBody || files.length === 0)');
+
+    expect(file_get_contents(__DIR__ . '/../../resources/dist/filament-tinymce-editor.js'))->toContain('"dragstart"');
+})->group('compatibility', 'filament5');
+
 it('saves a pasted image through the Filament 5 schema component call', function () {
     $viewContent = file_get_contents(__DIR__ . '/../../resources/views/tiny-editor.blade.php');
 
